@@ -1,4 +1,4 @@
-# **Handyman**
+# ![favicon.png](./assets/1643818981342-favicon.png) **Handyman** ![settings.png](./assets/1643819101879-settings.png)
 
 **Handyman is a mobile application which can be used by the people
 to book (or) make an appointment for a home service such has electricians,

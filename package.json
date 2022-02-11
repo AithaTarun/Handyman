@@ -1,7 +1,7 @@
 {
   "name": "Handyman",
   "version": "0.0.1",
-  "author": "Ionic Framework",
+  "author": "Aitha Tarun",
   "homepage": "https://ionicframework.com/",
   "scripts": {
     "ng": "ng",
@@ -9,7 +9,8 @@
     "build": "ng build",
     "test": "ng test",
     "lint": "ng lint",
-    "e2e": "ng e2e"
+    "e2e": "ng e2e",
+    "ionic": "ionic serve"
   },
   "private": true,
   "dependencies": {
@@ -26,6 +27,8 @@
     "@capacitor/keyboard": "1.2.1",
     "@capacitor/status-bar": "1.0.7",
     "@ionic/angular": "^6.0.0",
+    "express": "^4.17.2",
+    "mongoose": "^6.2.1",
     "rxjs": "~6.6.0",
     "tslib": "^2.2.0",
     "zone.js": "~0.11.4"
@@ -63,5 +66,5 @@
     "ts-node": "~8.3.0",
     "typescript": "~4.4.4"
   },
-  "description": "An Ionic project"
+  "description": "Handyman Project"
 }
