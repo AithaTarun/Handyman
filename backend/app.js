@@ -40,6 +40,16 @@ app.use
   express.json()
 );
 
+app.use
+{
+  express.urlencoded
+  (
+    {
+      extended: true
+    }
+  )
+}
+
 try
 {
   app.use //To handle CORS error.
@@ -85,5 +95,7 @@ catch (e)
 }
 
 // Routes
+const userRoutes = require('./routes/user');
+app.use("/api/user", userRoutes);
 
 module.exports = app;
