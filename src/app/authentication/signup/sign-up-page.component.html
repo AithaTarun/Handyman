@@ -1,11 +1,140 @@
 <ion-header>
   <ion-toolbar color="light">
-
     <ion-title color="primary">SIGN-UP</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="closeSignUp()"><ion-img src="assets/icons/close.png" style="height: 24px; width: 24px"></ion-img></ion-button>
+    </ion-buttons>
 
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding" style="--background: url(assets/backgrounds/authentication.png) 0 0/100% 100% no-repeat">
+
+  <!-- Role Selection -->
+  <ion-segment class="ion-margin-bottom" value="handyman" (ionChange)="onRoleChange($event)">
+    <ion-segment-button value="handyman">
+      <ion-img [src]="selectedRole == 'handyman' ? 'assets/icons/handyman_active.png' : 'assets/icons/handyman_inactive.png'" style="width: 48px; height: 48px"></ion-img>
+      <ion-label style="font-weight: bold">Handyman</ion-label>
+    </ion-segment-button>
+
+    <ion-segment-button value="customer">
+      <ion-img [src]="selectedRole == 'customer' ? 'assets/icons/customers_active.png' : 'assets/icons/customers_inactive.png'" style="width: 48px; height: 48px"></ion-img>
+      <ion-label style="font-weight: bold">Customer</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <form (submit)="onSignUp()" action="" [formGroup]="form" (change)="onFormChange()" class="ion-text-center">
+
+    <ion-list style="background-color: transparent">
+
+      <ion-item-divider color="primary" class="ion-margin">
+        <ion-label style="font-weight: bold">
+          General
+        </ion-label>
+      </ion-item-divider>
+
+      <ion-item class="ion-margin-horizontal ion-margin-bottom" style="--ion-background-color:transparent">
+        <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/username.png"></ion-img></ion-label>
+        <ion-input type="text" autocomplete="on" placeholder="Username" formControlName="username" [clearInput]="true" [minlength]="5" [maxlength]="10" [required]="true"></ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin" style="--ion-background-color:transparent">
+        <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/password.png"></ion-img></ion-label>
+        <ion-input type="password" autocomplete="on" placeholder="Password" formControlName="password" [clearInput]="true" [minlength]="5" [maxlength]="15" [required]="true"></ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin-horizontal ion-margin-bottom" style="--ion-background-color:transparent">
+        <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/name.png"></ion-img></ion-label>
+        <ion-input type="text" autocomplete="on" placeholder="First Name" formControlName="first_name" [clearInput]="true" [required]="true"></ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin-horizontal ion-margin-bottom" style="--ion-background-color:transparent">
+        <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/name.png"></ion-img></ion-label>
+        <ion-input type="text" autocomplete="on" placeholder="Last Name" formControlName="last_name" [clearInput]="true" [required]="true"></ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin" style="--ion-background-color:transparent">
+        <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/email.png"></ion-img></ion-label>
+        <ion-input type="email" autocomplete="on" placeholder="Email" formControlName="email" [clearInput]="true" [required]="true"></ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin" style="--ion-background-color:transparent">
+        <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/phone.png"></ion-img></ion-label>
+        <ion-input type="tel" autocomplete="on" placeholder="Phone" formControlName="phone" [clearInput]="true" [required]="true" maxlength="10"></ion-input>
+      </ion-item>
+
+      <ion-item-divider color="primary" style="margin-top: 20px" class="ion-margin">
+        <ion-label style="font-weight: bold">
+          Address
+        </ion-label>
+      </ion-item-divider>
+
+      <ion-button type="button" color="primary" fill="outline" shape="round" (click)="openMap()" >
+        <ion-label class="ion-margin-horizontal">Locate On Map</ion-label>
+        <ion-img class="ion-float-right ion-margin-horizontal" src="assets/icons/open_map.png"></ion-img>
+      </ion-button>
+
+      <ion-item class="ion-margin" style="--ion-background-color:transparent">
+        <ion-label><ion-img class="ion-float-left" style="height: 40px; width: 40px" src="assets/icons/locality.png"></ion-img></ion-label>
+        <ion-input type="text" autocomplete="on" placeholder="Locality" formControlName="locality" [clearInput]="true" [required]="true"></ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin" style="--ion-background-color:transparent">
+        <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/landmark.png"></ion-img></ion-label>
+        <ion-input type="text" autocomplete="on" placeholder="Landmark" formControlName="landmark" [clearInput]="true"></ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin" style="--ion-background-color:transparent">
+        <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/pin_code.png"></ion-img></ion-label>
+        <ion-input type="number" autocomplete="on" placeholder="PIN Code" formControlName="pin_code" [clearInput]="true"
+                   maxlength="6" [required]="true"></ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin" style="--ion-background-color:transparent">
+        <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/city_district_town.png"></ion-img></ion-label>
+        <ion-input type="text" autocomplete="on" placeholder="City/District/Town" formControlName="city_district_town" [clearInput]="true" [required]="true"></ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin" style="--ion-background-color:transparent">
+        <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/state.png"></ion-img></ion-label>
+
+        <ion-select placeholder="State" formControlName="state" style="max-width: 90%">
+
+          <ion-select-option *ngFor="let state of states" [value]="state">
+            {{state}}
+          </ion-select-option>
+
+        </ion-select>
+      </ion-item>
+
+      <ion-item class="ion-margin" style="--ion-background-color:transparent">
+        <ion-label class="ion-align-self-center"><ion-img class="ion-float-left" style="height: 40px; width: 40px" src="assets/icons/address.png"></ion-img></ion-label>
+
+        <ion-textarea placeholder="Address Line" formControlName="address_line" spellcheck="true" [required]="true"></ion-textarea>
+      </ion-item>
+
+    </ion-list>
+
+    <ion-label id="formMessage" [color]="messageColor" class="ion-margin" style="font-weight: bold" *ngIf="formMessage">{{formMessage}}</ion-label>
+
+    <ion-grid class="ion-margin">
+      <ion-row>
+
+        <ion-col size="6">
+          <ion-button color="danger" (click)="onClearForm()" type="clear" shape="round">Clear</ion-button>
+        </ion-col>
+
+        <ion-col size="6">
+          <ion-button color="primary" [disabled]="!form.valid" type="submit" shape="round">
+            SIGN UP
+          </ion-button>
+        </ion-col>
+
+      </ion-row>
+    </ion-grid>
+
+    <ion-label class="ion-margin">Already a user ? <a (click)="openSignIn()">SIGN IN</a></ion-label>
+  </form>
 
 </ion-content>

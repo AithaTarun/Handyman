@@ -1,0 +1,6 @@
+{
+	"appId": "io.ionic.starter",
+	"appName": "Handyman",
+	"webDir": "www",
+	"bundledWebRuntime": false
+}

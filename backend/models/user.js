@@ -5,11 +5,17 @@ const uniqueValidator = require('mongoose-unique-validator');
 const userSchema = new mongoose.Schema
 (
   {
+    role:
+      {
+        type: String,
+        enum: ['admin', 'handyman', 'customer'],
+        required: true
+      },
+
     username:
       {
         type: String,
-        required: true,
-        unique: true
+        required: true
       },
 
     password:
@@ -18,10 +24,15 @@ const userSchema = new mongoose.Schema
         required: true
       },
 
-    role:
+    first_name:
       {
         type: String,
-        enum: ['Admin', 'Handyman', 'Customer'],
+        required: true
+      },
+
+    last_name:
+      {
+        type: String,
         required: true
       },
 
@@ -35,7 +46,50 @@ const userSchema = new mongoose.Schema
     phone:
       {
         type: String,
+        required: true,
         unique: true
+      },
+
+    address:
+      {
+        type:
+          {
+            locality:
+              {
+                type: String,
+                required: true
+              },
+
+            landmark:
+              {
+                type: String
+              },
+
+            pin_code:
+              {
+                type: Number,
+                required: true
+              },
+
+            city_district_town:
+              {
+                type: String,
+                required: true
+              },
+
+            state:
+              {
+                type: String,
+                required: true
+              },
+
+            address_line:
+              {
+                type: String,
+                required: true
+              }
+          },
+        required: true
       },
 
     verified:
@@ -46,6 +100,8 @@ const userSchema = new mongoose.Schema
       }
   }
 );
+
+userSchema.index({"username": 1, "role": 1}, {unique: true}); // Making combination of role and username unique
 
 userSchema.plugin(uniqueValidator);
 

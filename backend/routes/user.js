@@ -14,6 +14,18 @@ router.post
 
 router.post
 (
+  '/verify',
+  userController.verifyUser
+);
+
+router.post
+(
+  '/resendOTP',
+  userController.resendOTP
+);
+
+router.post
+(
   '/signin',
   userController.loginUser
 );

@@ -1,8 +1,14 @@
 const User = require('../models/user');
+const Otp = require('../models/otp');
 
 const bcrypt = require('bcrypt');
 
 const jsonwebtoken = require('jsonwebtoken');
+
+const nodemailer = require('nodemailer');
+const {dirname} = require("path");
+
+const Email = require('email-templates');
 
 exports.createUser = async (request, response, next) =>
 {
@@ -10,18 +16,34 @@ exports.createUser = async (request, response, next) =>
   {
     const hashedPassword = await bcrypt.hash(request.body.password, 10);
 
+    const address =
+      {
+        locality: request.body.locality,
+        landmark: request.body.landmark || '',
+        pin_code: request.body.pin_code,
+        city_district_town: request.body.city_district_town,
+        state: request.body.state,
+        address_line: request.body.address_line
+      };
+
     const user = new User
     (
       {
+        role: request.body.role,
         username : request.body.username,
         password : hashedPassword,
-        role: request.body.role,
+        first_name : request.body.first_name,
+        last_name : request.body.last_name,
         email: request.body.email,
-        phone: request.body.phone
+        phone: request.body.phone,
+        address: address
       }
     );
 
     const result = await user.save();
+
+    const otpResult = await sendAccountActivationMail(request.body.email, result._id);
+    console.log("Result : ", otpResult);
 
     return response.status(201).send
     (
@@ -61,6 +83,176 @@ exports.createUser = async (request, response, next) =>
   }
 };
 
+exports.resendOTP = async (request, response, next)=>
+{
+  try
+  {
+    const user = await User.findOne
+    (
+      {
+        username: request.body.username,
+        role: request.body.role
+      }
+    );
+
+    if (user)
+    {
+      const otpResult = await sendAccountActivationMail(user.email, user._id);
+
+      if (otpResult.toString() === "-1")
+      {
+        return response.status(400).send({status: false, message: "Error while resending OTP"});
+      }
+      else
+      {
+        return response.status(200).send({status: false, message: "Resent OTP Successfully"});
+      }
+    }
+    else
+    {
+      console.log("User not found");
+      return response.status(400).send({status: false, message: "User not found"});
+    }
+  }
+  catch (error)
+  {
+    console.log("Error while resending OTP : ", error);
+    return response.status(400).send({status: false, message: error.message});
+  }
+}
+
+sendAccountActivationMail = async (toMail, userID) =>
+{
+  try
+  {
+    const appDir = dirname(require.main.filename);
+
+    const transporter = nodemailer.createTransport
+    (
+      {
+        service: 'gmail',
+
+        auth:
+          {
+            user: process.env.MAIL_ID,
+            pass: process.env.MAIL_PASSWORD
+          }
+      }
+    );
+
+    const email = new Email();
+
+    const otpCode =  Math.floor(Math.random() * (9999 - 1000 + 1) + 1000);
+
+    const otpRecord =
+      {
+        otp: otpCode,
+        userID: userID
+      };
+
+    await Otp.findOneAndUpdate({userID: userID}, otpRecord, {upsert: true});
+
+    const html = await email.render
+    (
+      appDir + '/backend/views/otpVerification.ejs', {otpCode: otpCode}
+    );
+
+    const mainOptions =
+      {
+        from: process.env.MAIL_ID,
+        to: toMail,
+        subject: 'Handyman OTP Verification',
+        html: html
+      };
+
+    const result = await transporter.sendMail(mainOptions);
+
+    console.log("Mail status : ", result);
+
+    return 1;
+  }
+  catch (error)
+  {
+    console.log("Error while sending OTP : ", error);
+
+    return -1;
+  }
+}
+
+exports.verifyUser = async (request, response, next) =>
+{
+  try
+  {
+    const user = await User.findOne
+    (
+      {
+        username: request.body.username,
+        role: request.body.role
+      }
+    );
+
+    if (user)
+    {
+      const otpResult = await Otp.findOne
+      (
+        {
+          userID: user._id
+        }
+      );
+
+      if (otpResult)
+      {
+        if (otpResult.otp.toString() === request.body.otp.toString())
+        {
+          const updateResult = await User.updateOne
+          (
+            {
+              _id: otpResult.userID
+            },
+            {
+              verified: true
+            }
+          );
+
+          if (updateResult)
+          {
+            console.log("Verified user successfully");
+
+            await Otp.deleteOne
+            (
+              {
+                _id: otpResult._id
+              }
+            );
+
+            return response.status(200).send({status: true, message: "Verified user successfully"});
+          }
+        }
+        else
+        {
+          console.log("Incorrect OTP");
+          return response.status(400).send({status: false, message: "Incorrect OTP"});
+        }
+      }
+      else
+      {
+        console.log("Invalid OTP");
+        return response.status(400).send({status: false, message: "Invalid OTP"});
+      }
+    }
+    else
+    {
+      console.log("User not found");
+      return response.status(400).send({status: false, message: "User not found"});
+    }
+  }
+  catch (error)
+  {
+    console.log("Error while verifying user : ", error);
+    return response.status(400).send({status: false, message: error.message});
+  }
+}
+
 exports.loginUser = async (request, response, next) =>
 {
   try
@@ -68,6 +260,7 @@ exports.loginUser = async (request, response, next) =>
     const user = await User.findOne
     (
       {
+        role: request.body.role,
         username: request.body.username
       }
     );
@@ -79,20 +272,28 @@ exports.loginUser = async (request, response, next) =>
 
       if (passwordResult) // Valid password
       {
-        const token = jsonwebtoken.sign
-        (
+        if (user.verified)
+        {
+          const token = jsonwebtoken.sign
+          (
 
-          {
-            user
-          },
-          process.env.SECRET_KEY,
-          {
-            expiresIn: request.body.remember ? '30d' : '1d'
-          }
-        )
+            {
+              user
+            },
+            process.env.SECRET_KEY,
+            {
+              expiresIn: request.body.remember ? '15d' : '1d'
+            }
+          );
 
-        console.log("Found user");
-        return response.status(200).send({status: true, message: "Found user", token});
+          console.log("Found user");
+          return response.status(200).send({status: true, message: "Found user", token});
+        }
+        else // Account Not Verified
+        {
+          console.log("Account not verified");
+          return response.status(401).send({status: false, message: "Account not verified"});
+        }
       }
       else // Invalid password
       {

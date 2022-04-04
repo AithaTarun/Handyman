@@ -29,9 +29,9 @@ database.on
 
 database.on
 (
-  'error', () =>
+  'error', (error) =>
   {
-    console.log("Error while connecting to database");
+    console.log("Error while connecting to database : ", error);
   }
 );
 

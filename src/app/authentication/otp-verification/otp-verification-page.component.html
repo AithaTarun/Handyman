@@ -1,0 +1,64 @@
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-title color="primary">OTP VERIFICATION</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="closeOTPVerification()"><ion-img src="assets/icons/close.png" style="height: 24px; width: 24px"></ion-img></ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding" style="background-color: #FFFFFF">
+
+  <div class="ion-align-items-center ion-justify-content-center ion-margin-top" style="display: flex">
+    <ion-img src="assets/landings/otp.png" style="width: 256px; height: 256px"></ion-img>
+  </div>
+
+  <div class="ion-text-center ion-margin-top">
+    <p style="font-weight: bold; color: #6c757d">Enter the OTP sent to your registered mail</p>
+  </div>
+
+  <form (submit)="onVerify()" action="" [formGroup]="form">
+
+    <div style="margin-top: 30px">
+      <ion-grid>
+        <ion-row class="ion-text-center" style="display: flex; justify-content: space-between">
+
+          <ion-col size="2"><ion-input formControlName="otp1" class="otpInput" type="number" (keydown)="onDigitDown($event, otp1)" (keyup)="focusForward($event, otp2)" required="true" #otp1></ion-input></ion-col>
+
+          <ion-col size="2"><ion-input formControlName="otp2" class="otpInput" type="number" (keydown)="onDigitDown($event, otp2)" (keyup)="focusForward($event, otp3)" (keyup.backspace)="focusBack(otp1)" required="true" #otp2></ion-input></ion-col>
+
+          <ion-col size="2"><ion-input formControlName="otp3" class="otpInput" type="number" (keydown)="onDigitDown($event, otp3)" (keyup)="focusForward($event, otp4)" (keyup.backspace)="focusBack(otp2)" required="true" #otp3></ion-input></ion-col>
+
+          <ion-col size="2"><ion-input formControlName="otp4" class="otpInput" type="number" (keydown)="onDigitDown($event, otp4)" (keyup.backspace)="focusBack(otp3)" required="true" #otp4></ion-input></ion-col>
+
+        </ion-row>
+      </ion-grid>
+    </div>
+
+    <div class="ion-margin-top ion-text-center" [style.display]="remainingResendSeconds > 0 ? 'block' : 'none'">
+      <p style="color: #6c757d">Resend OTP in <span style="font-weight: bold">{{remainingResendSeconds}} s</span> </p>
+    </div>
+
+    <div class="ion-text-center" style="margin-top: 25px">
+      <p style="font-weight: bold; color: #6c757d">Haven't received OTP ?
+        <a [style.color]="remainingResendSeconds > 0 ? '#6c757d' : '#3880ff'"
+           style="font-weight: normal" (click)="resendOTP()">
+          Resend OTP
+        </a>
+      </p>
+    </div>
+
+    <div class="ion-margin-vertical ion-text-center">
+      <ion-label id="formMessage" [color]="messageColor" class="ion-margin" style="font-weight: bold" *ngIf="formMessage">{{formMessage}}</ion-label>
+    </div>
+
+    <div style="margin-top: 30px">
+      <ion-button expand="block" color="primary" type="submit" [disabled]="form.invalid">Verify</ion-button>
+    </div>
+
+  </form>
+
+</ion-content>
+

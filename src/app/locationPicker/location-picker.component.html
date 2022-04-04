@@ -1,0 +1,64 @@
+<ion-header>
+  <ion-toolbar color="light">
+    <ion-title color="primary">Pick Your Location</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="closeLocationPick()"><ion-img src="assets/icons/close.png" style="height: 24px; width: 24px"></ion-img></ion-button>
+    </ion-buttons>
+
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div #mapHolder style="position: absolute; top: 0; bottom: 0; width: 100%"></div>
+
+  <ion-grid style="padding-top: 0; margin-right: 5px">
+    <ion-row>
+      <ion-col size="11">
+        <div class="addressSearch">
+          <ion-item color="light" style="--highlight-color-focused: var(--ion-color-primary)">
+            <ion-label style="margin-top: 0; margin-bottom: 0"><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/mapSearch.png"></ion-img></ion-label>
+            <ion-input clearInput="true" type="text" placeholder="Search" (ionInput)="changedAddress(searchBar.value)" #searchBar></ion-input>
+          </ion-item>
+
+
+          <div style="width: 100%; display: flex; justify-content: center; position: absolute">
+            <ion-button expand="block" shape="round" color="primary" (click)="locationConfirmed()">
+              Confirm Location
+            </ion-button>
+          </div>
+
+          <ion-list style="margin-top: 2px; border-radius: 10px; display: none" #locationsList>
+
+            <ion-item lines="none" class="ion-no-padding" style="padding-right: 10px; padding-left: 10px" *ngFor="let location of searchLocations; let i = index" (click)="locationClicked(i)">
+
+              <ion-grid class="ion-no-padding" fixed="true">
+                <ion-row>
+
+                  <ion-col size="1" class="ion-align-self-center">
+                    <ion-img src="assets/icons/location.png" style="height: 24px; width: 24px"></ion-img>
+                  </ion-col>
+
+                  <ion-col size="10" offset="1">
+                    <p class="ion-no-margin" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap; font-weight: bold">{{location.text}}</p>
+                    <p class="ion-no-margin" style="text-overflow: ellipsis; overflow: hidden; white-space: nowrap">{{location.place_name}}</p>
+                  </ion-col>
+
+                </ion-row>
+              </ion-grid>
+            </ion-item>
+
+          </ion-list>
+        </div>
+      </ion-col>
+
+    </ion-row>
+  </ion-grid>
+
+  <ion-img [src]="mapStyle == 'streets' ? 'assets/icons/satelliteMaps.png' : 'assets/icons/streetMaps.png'"
+           style="position: absolute; bottom: 5px; left: 5px; width: 64px; height: 48px" (click)="toggleMapStyle()"></ion-img>
+
+  <div class="address" [style]="selectedAddress !== '' ? 'display:block' : 'display:none' ">
+    {{selectedAddress}}
+  </div>
+</ion-content>

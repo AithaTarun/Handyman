@@ -1,11 +1,64 @@
 <ion-header>
   <ion-toolbar color="light">
-
     <ion-title color="primary">SIGN-IN</ion-title>
+
+    <ion-buttons slot="end">
+      <ion-button (click)="closeSignIn()"><ion-img src="assets/icons/close.png" style="height: 24px; width: 24px"></ion-img></ion-button>
+    </ion-buttons>
 
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
+<ion-content class="ion-padding" style="--background: url(assets/backgrounds/authentication.png) 0 0/100% 100% no-repeat">
+
+  <!-- Role Selection -->
+  <ion-segment class="ion-margin-bottom" value="handyman" (ionChange)="onRoleChange($event)">
+    <ion-segment-button value="handyman">
+      <ion-img [src]="selectedRole == 'handyman' ? 'assets/icons/handyman_active.png' : 'assets/icons/handyman_inactive.png'" style="width: 48px; height: 48px"></ion-img>
+      <ion-label style="font-weight: bold">Handyman</ion-label>
+    </ion-segment-button>
+
+    <ion-segment-button value="customer">
+      <ion-img [src]="selectedRole == 'customer' ? 'assets/icons/customers_active.png' : 'assets/icons/customers_inactive.png'" style="width: 48px; height: 48px"></ion-img>
+      <ion-label style="font-weight: bold">Customer</ion-label>
+    </ion-segment-button>
+  </ion-segment>
+
+  <form (submit)="onSignIn()" action="" [formGroup]="form" (change)="onFormChange()" class="ion-text-center">
+
+    <ion-list style="background-color: transparent">
+
+      <ion-item class="ion-margin-horizontal ion-margin-bottom" style="--ion-background-color:transparent">
+        <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/username.png"></ion-img></ion-label>
+        <ion-input type="text" autocomplete="on" placeholder="Username" formControlName="username" [clearInput]="true" [minlength]="5" [maxlength]="10" [required]="true"></ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin" style="--ion-background-color:transparent">
+        <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/password.png"></ion-img></ion-label>
+        <ion-input type="password" autocomplete="on" placeholder="Password" formControlName="password" [clearInput]="true" [minlength]="5" [maxlength]="15" [required]="true"></ion-input>
+      </ion-item>
+
+    </ion-list>
+
+    <ion-label id="formMessage" [color]="messageColor" class="ion-margin" style="font-weight: bold" *ngIf="formMessage">{{formMessage}}</ion-label>
+
+    <ion-grid class="ion-margin">
+      <ion-row>
+
+        <ion-col size="6">
+          <ion-button color="danger" (click)="onClearForm()" type="clear" shape="round">Clear</ion-button>
+        </ion-col>
+
+        <ion-col size="6">
+          <ion-button color="primary" [disabled]="!form.valid" type="submit" shape="round">
+            SIGN IN
+          </ion-button>
+        </ion-col>
+
+      </ion-row>
+    </ion-grid>
+
+    <ion-label class="ion-margin">Don't have account ? <a (click)="openSignUp()">SIGN UP</a></ion-label>
+  </form>
 
 </ion-content>

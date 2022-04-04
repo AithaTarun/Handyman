@@ -8,14 +8,17 @@ import { SignupPageRoutingModule } from './signup-routing.module';
 
 import { SignUpPage } from './sign-up-page.component';
 
+import {BrowserModule} from "@angular/platform-browser";
+
 @NgModule({
     imports: [
         CommonModule,
         FormsModule,
         IonicModule,
         SignupPageRoutingModule,
-        ReactiveFormsModule
+        ReactiveFormsModule,
+        BrowserModule
     ],
-  declarations: [SignUpPage]
+  declarations: [SignUpPage],
 })
 export class SignupPageModule {}
