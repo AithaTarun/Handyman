@@ -11,7 +11,9 @@
 
     <ion-buttons slot="end">
       <ion-button>
-        <ion-img [src]="authenticationIcon" style="width: 38px; height: 38px" (click)="onAuthenticationModalOpen()"></ion-img>
+        <ion-img [src]="authenticationIcon" style="width: 38px; height: 38px"
+                 (click)="this.authenticationService.getIsAuthenticated() ? this.authenticationService.logout() : onAuthenticationModalOpen()">
+        </ion-img>
       </ion-button>
     </ion-buttons>
 

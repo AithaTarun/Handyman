@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
-import {Observable} from "rxjs";
+import {Observable, Subject} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
+import {ModalController} from "@ionic/angular";
 
 @Injectable
 ({
@@ -9,18 +10,18 @@ import {environment} from "../../environments/environment";
 })
 export class AuthenticationService
 {
+  private token: string;
+  private authenticationStatusListener : Subject<boolean> = new Subject<boolean>();
+
   private isAuthenticated = false;
+
+  private tokenTimer: any;
 
   private BACKEND_URL = environment.BACKEND_URL;
 
-  constructor(private http: HttpClient)
+  constructor(private http: HttpClient, private modalController: ModalController)
   {
 
-  }
-
-  public getIsAuthenticated()
-  {
-    return this.isAuthenticated;
   }
 
   createUser(role: string,
@@ -69,14 +70,124 @@ export class AuthenticationService
     );
   }
 
-  loginUser(role: string, username: string, password: string,): Observable<any>
+  loginUser(role: string, username: string, password: string, remember: boolean): Observable<any>
   {
-    const userData = {role, username, password};
+    const userData = {role, username, password, remember};
 
     return this.http.post
     (
       this.BACKEND_URL+ '/user/signin',
       userData
     );
+  }
+
+  async login(response)  // Called after user has successfully logged in.
+  {
+    this.token = response.token;
+    if (this.token)
+    {
+      const expiresInDuration = response.expiresIn;
+      this.setAuthenticationTimer(expiresInDuration);
+
+      this.authenticationStatusListener.next(true);
+      this.isAuthenticated = true;
+
+      const now = new Date();
+      const expirationDate = new Date(now.getTime() + expiresInDuration * 1000);
+
+      AuthenticationService.saveAuthenticationData(this.token, expirationDate);
+
+      await this.modalController.dismiss(null, 'cancel');
+    }
+  }
+
+  getAuthStatusListener()
+  {
+    return this.authenticationStatusListener.asObservable();
+  }
+
+  getIsAuthenticated()
+  {
+    return this.isAuthenticated;
+  }
+
+  logout()
+  {
+    this.token = null;
+    this.isAuthenticated = false;
+
+    this.authenticationStatusListener.next(false);
+
+    clearTimeout(this.tokenTimer);
+
+    AuthenticationService.clearAuthenticationData();
+  }
+
+  private static saveAuthenticationData(token: string, expirationDate: Date)
+  {
+    localStorage.setItem('token', token);
+    localStorage.setItem('expiration', expirationDate.toISOString());
+  }
+
+  private static clearAuthenticationData()
+  {
+    localStorage.removeItem('token');
+    localStorage.removeItem('expiration');
+  }
+
+  autoAuthenticateUser()
+  {
+    const authInformation = AuthenticationService.getAuthenticationData();
+
+    if (!authInformation)
+    {
+      return;
+    }
+
+    const now = new Date();
+
+    const expiresIn = authInformation.expirationDate.getTime() - now.getTime();
+
+    if (expiresIn > 0)
+    {
+      this.token = authInformation.token;
+      this.isAuthenticated = true;
+      this.setAuthenticationTimer(expiresIn / 1000);
+
+      this.authenticationStatusListener.next(true);
+    }
+  }
+
+  private static getAuthenticationData()
+  {
+    const token = localStorage.getItem('token');
+    const expirationDate = localStorage.getItem('expiration');
+
+    if (!token || !expirationDate)
+    {
+      return;
+    }
+
+    return {
+      token,
+      expirationDate : new Date(expirationDate),
+    }
+  }
+
+  private setAuthenticationTimer(duration: number)
+  {
+    this.tokenTimer = setTimeout
+    (
+      () =>
+      {
+        this.logout();
+      },
+      duration * 1000 // Seconds -> Milliseconds.
+    );
+  }
+
+  public getToken()
+  {
+    return this.token;
   }
 }

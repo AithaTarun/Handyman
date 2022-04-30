@@ -59,6 +59,12 @@ export class SignInPage implements OnInit
               ]
           }
         ),
+
+        // Remember Me
+        'remember' : new FormControl
+        (
+          false
+        )
       }
     );
   }
@@ -118,6 +124,7 @@ export class SignInPage implements OnInit
       this.selectedRole,
       this.form.get('username').value,
       this.form.get('password').value,
+      this.form.get('remember').value
     );
 
     loginUserObservable
@@ -175,13 +182,13 @@ export class SignInPage implements OnInit
       )
       .subscribe
       (
-        (response: any) =>
+        async (response: any) =>
         {
           this.formMessage = "User logged in successfully";
           this.messageColor = 'success';
           this.form.reset();
 
-          this.closeSignIn();
+          await this.authenticationService.login(response);
         }
       )
 

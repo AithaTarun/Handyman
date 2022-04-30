@@ -38,6 +38,11 @@
         <ion-input type="password" autocomplete="on" placeholder="Password" formControlName="password" [clearInput]="true" [minlength]="5" [maxlength]="15" [required]="true"></ion-input>
       </ion-item>
 
+      <ion-item class="ion-margin" style="--ion-background-color:transparent">
+        <ion-checkbox color="secondary" checked="false" formControlName="remember"></ion-checkbox>
+        <ion-label class="ion-margin-start">Remember Me</ion-label>
+      </ion-item>
+
     </ion-list>
 
     <ion-label id="formMessage" [color]="messageColor" class="ion-margin" style="font-weight: bold" *ngIf="formMessage">{{formMessage}}</ion-label>

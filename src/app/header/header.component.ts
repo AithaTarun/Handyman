@@ -20,6 +20,14 @@ export class HeaderComponent implements OnInit
 
   ngOnInit()
   {
+    this.authenticationService.getAuthStatusListener().subscribe
+    (
+      (isAuthenticated) =>
+      {
+        this.authenticationIcon = isAuthenticated ? 'assets/icons/logout.png' : 'assets/icons/login.png';
+      }
+    );
+
     this.authenticationIcon = this.authenticationService.getIsAuthenticated() ? 'assets/icons/logout.png' : 'assets/icons/login.png';
   }
 

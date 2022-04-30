@@ -287,7 +287,12 @@ exports.loginUser = async (request, response, next) =>
           );
 
           console.log("Found user");
-          return response.status(200).send({status: true, message: "Found user", token});
+          return response.status(200).send
+          (
+            {
+              status: true, message: "Found user", token,
+              expiresIn: request.body.remember ? 1296000 : 86400 //This token expires in 3600 seconds = 1 hour
+            });
         }
         else // Account Not Verified
         {
