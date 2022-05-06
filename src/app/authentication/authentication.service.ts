@@ -1,8 +1,9 @@
-import { Injectable } from '@angular/core';
-import {Observable, Subject} from "rxjs";
+import {Injectable, OnInit} from '@angular/core';
+import {Observable, Subject, throwError} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {environment} from "../../environments/environment";
 import {ModalController} from "@ionic/angular";
+import {catchError} from "rxjs/operators";
 
 @Injectable
 ({
@@ -18,6 +19,9 @@ export class AuthenticationService
   private tokenTimer: any;
 
   private BACKEND_URL = environment.BACKEND_URL;
+
+  private currentUser: any;
+  private userChangeListener : Subject<any> = new Subject<any>();
 
   constructor(private http: HttpClient, private modalController: ModalController)
   {
@@ -97,6 +101,8 @@ export class AuthenticationService
 
       AuthenticationService.saveAuthenticationData(this.token, expirationDate);
 
+      await this.fetchUserDetails();
+
       await this.modalController.dismiss(null, 'cancel');
     }
   }
@@ -104,6 +110,17 @@ export class AuthenticationService
   getAuthStatusListener()
   {
     return this.authenticationStatusListener.asObservable();
+  }
+
+  getUserChangeListener()
+  {
+    return this.userChangeListener.asObservable();
+  }
+
+  public setCurrentUser(currentUser)
+  {
+    this.currentUser = currentUser;
+    this.userChangeListener.next(this.currentUser);
   }
 
   getIsAuthenticated()
@@ -117,10 +134,13 @@ export class AuthenticationService
     this.isAuthenticated = false;
 
     this.authenticationStatusListener.next(false);
+    this.userChangeListener.next(null);
 
     clearTimeout(this.tokenTimer);
 
     AuthenticationService.clearAuthenticationData();
+
+    this.currentUser = null;
   }
 
   private static saveAuthenticationData(token: string, expirationDate: Date)
@@ -135,7 +155,7 @@ export class AuthenticationService
     localStorage.removeItem('expiration');
   }
 
-  autoAuthenticateUser()
+  async autoAuthenticateUser()
   {
     const authInformation = AuthenticationService.getAuthenticationData();
 
@@ -155,6 +175,8 @@ export class AuthenticationService
       this.setAuthenticationTimer(expiresIn / 1000);
 
       this.authenticationStatusListener.next(true);
+
+      await this.fetchUserDetails();
     }
   }
 
@@ -189,5 +211,59 @@ export class AuthenticationService
   public getToken()
   {
     return this.token;
+  }
+
+  public getCurrentUser()
+  {
+    return this.currentUser;
+  }
+
+  updateUser(first_name: string,
+             last_name: string,
+             email: string,
+             phone: string,
+             locality: string,
+             landmark: string,
+             pin_code: number,
+             city_district_town: string,
+             state: string,
+             address_line: string
+  ): Observable<any>
+  {
+    const userData = {first_name, last_name, email, phone, locality, landmark,  pin_code, city_district_town, state, address_line};
+
+    return this.http.post
+    (
+      this.BACKEND_URL+ '/user/update',
+      userData
+    );
+  }
+
+  async fetchUserDetails()
+  {
+    await this.http.get
+    (
+      this.BACKEND_URL + '/user/fetch'
+    )
+      .pipe<any>
+      (
+        catchError
+        (
+          async (error: any) =>
+          {
+            console.log("Error while fetching user details : ", error);
+
+            return throwError('Error occurred');
+          }
+        )
+      )
+      .subscribe
+      (
+        (response) =>
+        {
+          this.currentUser = response.user;
+          this.userChangeListener.next(this.currentUser);
+        }
+      )
   }
 }

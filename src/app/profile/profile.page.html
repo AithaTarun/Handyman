@@ -1,0 +1,223 @@
+<ion-content class="ion-padding">
+
+  <div class="ion-text-center ion-margin-top" style="margin-right: auto; margin-left: auto">
+
+    <!-- User Avatar -->
+    <img [src]="currentProfileData && currentProfileData['avatar'] !== undefined ? currentProfileData.avatar.url : 'assets/icons/no_avatar.png'"
+             style="height: 128px; width: 128px; border-radius: 50%"
+             (click)="userAvatar.click()" *ngIf="!avatarUploading" />
+
+    <div style="margin-left: auto; margin-right: auto; position: relative" *ngIf="avatarUploading">
+      <img [src]="currentProfileData && currentProfileData['avatar'] !== undefined ? currentProfileData.avatar.url : 'assets/icons/no_avatar.png'"
+           style="height: 128px; width: 128px; border-radius: 50%; filter: blur(2px)" />
+
+      <img src="assets/loaders/loader_1.gif"
+           style="height: 64px; width: 64px; position: absolute; top: 30px; bottom: 30px; left: 30px; right: 30px" />
+    </div>
+
+    <input accept="image/*" type="file" #userAvatar style="visibility: hidden" (change)="avatarChanged($event)">
+
+    <div *ngIf="currentUser">
+
+      <form (submit)="onUserDetailsUpdate()" action="" [formGroup]="form" (change)="onFormChange()" class="ion-text-center">
+
+        <ion-list style="background-color: transparent">
+
+          <ion-item-divider color="primary" class="ion-margin" style="margin-left: 0; margin-right: 0; margin-top: 0">
+            <ion-label style="font-weight: bold">
+              General
+            </ion-label>
+          </ion-item-divider>
+
+          <ion-item class="ion-margin-horizontal ion-margin-bottom" style="--ion-background-color:transparent">
+            <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/username.png"></ion-img></ion-label>
+            <ion-input type="text" formControlName="username"></ion-input>
+          </ion-item>
+
+          <ion-item class="ion-margin-horizontal ion-margin-bottom" style="--ion-background-color:transparent">
+            <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/name.png"></ion-img></ion-label>
+            <ion-input type="text" autocomplete="on" placeholder="First Name" formControlName="first_name" [clearInput]="true" [required]="true"></ion-input>
+          </ion-item>
+
+          <ion-item class="ion-margin-horizontal ion-margin-bottom" style="--ion-background-color:transparent">
+            <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/name.png"></ion-img></ion-label>
+            <ion-input type="text" autocomplete="on" placeholder="Last Name" formControlName="last_name" [clearInput]="true" [required]="true"></ion-input>
+          </ion-item>
+
+          <ion-item class="ion-margin" style="--ion-background-color:transparent">
+            <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/email.png"></ion-img></ion-label>
+            <ion-input type="email" formControlName="email"></ion-input>
+          </ion-item>
+
+          <ion-item class="ion-margin" style="--ion-background-color:transparent">
+            <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/phone.png"></ion-img></ion-label>
+            <ion-input type="tel" autocomplete="on" placeholder="Phone" formControlName="phone" [clearInput]="true" [required]="true" maxlength="10"></ion-input>
+          </ion-item>
+
+          <ion-item-divider color="primary" style="margin-top: 20px; margin-left: 0; margin-right: 0" class="ion-margin">
+            <ion-label style="font-weight: bold">
+              Address
+            </ion-label>
+          </ion-item-divider>
+
+          <ion-button type="button" color="primary" fill="outline" shape="round" (click)="openMap()" >
+            <ion-label class="ion-margin-horizontal">Locate On Map</ion-label>
+            <ion-img class="ion-float-right ion-margin-horizontal" src="assets/icons/open_map.png"></ion-img>
+          </ion-button>
+
+          <ion-item class="ion-margin" style="--ion-background-color:transparent">
+            <ion-label><ion-img class="ion-float-left" style="height: 40px; width: 40px" src="assets/icons/locality.png"></ion-img></ion-label>
+            <ion-input type="text" autocomplete="on" placeholder="Locality" formControlName="locality" [clearInput]="true" [required]="true"></ion-input>
+          </ion-item>
+
+          <ion-item class="ion-margin" style="--ion-background-color:transparent">
+            <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/landmark.png"></ion-img></ion-label>
+            <ion-input type="text" autocomplete="on" placeholder="Landmark" formControlName="landmark" [clearInput]="true"></ion-input>
+          </ion-item>
+
+          <ion-item class="ion-margin" style="--ion-background-color:transparent">
+            <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/pin_code.png"></ion-img></ion-label>
+            <ion-input type="number" autocomplete="on" placeholder="PIN Code" formControlName="pin_code" [clearInput]="true"
+                       maxlength="6" [required]="true"></ion-input>
+          </ion-item>
+
+          <ion-item class="ion-margin" style="--ion-background-color:transparent">
+            <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/city_district_town.png"></ion-img></ion-label>
+            <ion-input type="text" autocomplete="on" placeholder="City/District/Town" formControlName="city_district_town" [clearInput]="true" [required]="true"></ion-input>
+          </ion-item>
+
+          <ion-item class="ion-margin" style="--ion-background-color:transparent">
+            <ion-label><ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/state.png"></ion-img></ion-label>
+
+            <ion-select placeholder="State" formControlName="state" style="max-width: 90%">
+
+              <ion-select-option *ngFor="let state of states" [value]="state">
+                {{state}}
+              </ion-select-option>
+
+            </ion-select>
+          </ion-item>
+
+          <ion-item class="ion-margin" style="--ion-background-color:transparent">
+            <ion-label class="ion-align-self-center"><ion-img class="ion-float-left" style="height: 40px; width: 40px" src="assets/icons/address.png"></ion-img></ion-label>
+
+            <ion-textarea placeholder="Address Line" formControlName="address_line" spellcheck="true" [required]="true"></ion-textarea>
+          </ion-item>
+
+        </ion-list>
+
+        <ion-label id="formMessage" [color]="messageColor" class="ion-margin" style="font-weight: bold" *ngIf="formMessage">{{formMessage}}</ion-label>
+
+        <ion-button color="primary" [disabled]="!form.valid" type="submit" shape="round" size="block">
+          Update
+        </ion-button>
+
+      </form>
+
+    </div>
+
+    <div *ngIf="currentUser.role === 'handyman'">
+
+      <ion-list style="background-color: transparent">
+
+        <ion-item-divider color="primary" class="ion-margin" style="margin-left: 0; margin-right: 0">
+          <ion-label style="font-weight: bold">
+            Verification Documents
+          </ion-label>
+        </ion-item-divider>
+
+      </ion-list>
+
+      <ion-item class="ion-margin">
+        <ion-label>Select Document Type</ion-label>
+        <ion-select interface="action-sheet" value="aadhaarCard" #documentSelector (ionChange)="documentSelectionChanged(documentSelector)">
+          <ion-select-option value="aadhaarCard">Aadhaar Card</ion-select-option>
+          <ion-select-option value="panCard">Pan Card</ion-select-option>
+          <ion-select-option value="skillCertificates">Skill Certificates</ion-select-option>
+          <ion-select-option value="previousEmployerDocuments">Previous Employer Documents</ion-select-option>
+        </ion-select>
+      </ion-item>
+
+      <!-- PDF Viewer -->
+      <ion-text class="ion-text-center ion-margin" color="secondary" style="font-size: 22px; font-family: 'Audiowide', sans-serif; font-weight: bold">
+        {{currentDocument}}
+      </ion-text>
+
+      <div *ngIf="currentDocumentSRC === undefined" class="ion-margin">
+        <ion-img src="assets/icons/documentUpload.png" style="width: 96px; height: 96px; margin-left: auto; margin-right: auto" (click)="userDocument.click()"></ion-img>
+      </div>
+      <div *ngIf="currentDocumentSRC !== undefined && visible" class="ion-margin">
+
+        <ngx-extended-pdf-viewer
+          [customToolbar]="customToolbar"
+          [src]="currentDocumentSRC"
+          [height]="'256px'"
+          [useBrowserLocale]="true"
+          [textLayer]="true"
+          [contextMenuAllowed]="false"
+          [enableDragAndDrop]="false"
+          [enablePinchOnMobile]="true"
+          [enablePrint]="false"
+          page="1"
+          [pageViewMode]="'single'"
+          [zoom]="'page-width'"
+          [filenameForDownload]="currentDocument"
+
+          [showToolbar]="true"
+          [showSidebarButton]="true"
+          [showPagingButtons]="true"
+          [showZoomButtons]="false"
+          [showPresentationModeButton]="true"
+          [showOpenFileButton]="false"
+          [showPrintButton]="false"
+          [showDownloadButton]="true"
+          [showBookmarkButton]="false"
+          [showSecondaryToolbarButton]="true"
+          [showRotateButton]="false"
+          [showHandToolButton]="false"
+          [showScrollingButton]="false"
+          [showSpreadButton]="false"
+          [showPropertiesButton]="false"
+        >
+        </ngx-extended-pdf-viewer>
+
+      </div>
+
+      <input accept="application/pdf" type="file" #userDocument style="visibility: hidden" (change)="documentChanged($event, documentSelector)">
+
+      <ng-template #customToolbar>
+        <div id="toolbarViewer" style="background-color : lightblue">
+
+          <div id="toolbarViewerLeft">
+            <pdf-toggle-sidebar></pdf-toggle-sidebar>
+
+            <pdf-previous-page></pdf-previous-page>
+            <pdf-page-number></pdf-page-number>
+            <pdf-next-page></pdf-next-page>
+
+            <span style="margin: 4px; flex-direction: row; display: flex; align-items: center" (click)="userDocument.click()">
+                <ion-img src="assets/icons/fileUpload.svg"
+                         style="width: 22px; height: 22px">
+                </ion-img>
+                <ion-text style="margin-left: 3px">Change</ion-text>
+              </span>
+
+          </div>
+
+          <div id="toolbarViewerRight">
+
+            <pdf-presentation-mode></pdf-presentation-mode>
+
+            <pdf-download></pdf-download>
+
+            <pdf-toggle-secondary-toolbar></pdf-toggle-secondary-toolbar>
+          </div>
+
+        </div>
+      </ng-template>
+
+    </div>
+
+  </div>
+
+</ion-content>

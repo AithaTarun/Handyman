@@ -29,9 +29,19 @@
                 "glob": "**/*.svg",
                 "input": "node_modules/ionicons/dist/ionicons/svg",
                 "output": "./svg"
+              },
+              {
+                "glob": "**/*",
+                "input": "node_modules/ngx-extended-pdf-viewer/assets/",
+                "output": "/assets/"
               }
             ],
-            "styles": ["src/theme/variables.scss", "src/global.scss", "src/assets/css/mapbox-gl.css", "src/assets/css/mapbox-gl-geocoder.css"],
+            "styles": [
+              "src/theme/variables.scss",
+              "src/global.scss",
+              "src/assets/css/mapbox-gl.css",
+              "src/assets/css/mapbox-gl-geocoder.css"
+            ],
             "scripts": [],
             "aot": false,
             "vendorChunk": true,

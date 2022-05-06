@@ -10,6 +10,8 @@ const {dirname} = require("path");
 
 const Email = require('email-templates');
 
+const UserProfile = require('../models/userProfile');
+
 exports.createUser = async (request, response, next) =>
 {
   try
@@ -225,6 +227,9 @@ exports.verifyUser = async (request, response, next) =>
               }
             );
 
+            const userProfile = new UserProfile({userID: user._id});
+            const profileCreationResult = await userProfile.save();
+
             return response.status(200).send({status: true, message: "Verified user successfully"});
           }
         }
@@ -276,7 +281,6 @@ exports.loginUser = async (request, response, next) =>
         {
           const token = jsonwebtoken.sign
           (
-
             {
               user
             },
@@ -318,3 +322,115 @@ exports.loginUser = async (request, response, next) =>
     return response.status(401).send({status: false, message: error.message});
   }
 }
+
+exports.updateUser = async (request, response, next) =>
+{
+  try
+  {
+    const address =
+      {
+        locality: request.body.locality,
+        landmark: request.body.landmark || '',
+        pin_code: request.body.pin_code,
+        city_district_town: request.body.city_district_town,
+        state: request.body.state,
+        address_line: request.body.address_line
+      };
+
+    const user =
+      {
+        first_name : request.body.first_name,
+        last_name : request.body.last_name,
+        phone: request.body.phone,
+        address: address
+      };
+
+    const result = await User.findOneAndUpdate
+    (
+      {
+        _id: request.user._id
+      },
+      user,
+      {
+        new: true
+      }
+    );
+
+    return response.status(201).send
+    (
+      {
+        status: true,
+        message : 'Updated user details successfully',
+        user: result
+      }
+    );
+  }
+  catch (error)
+  {
+    console.log("Error while updating user : ", error);
+
+    let errorMessages = [];
+
+    Object.entries(error.errors)
+      .map(
+        err =>
+        {
+          console.log(err[0]);
+          errorMessages.push(err[0])
+        }
+      );
+
+    return response.status(500).send
+    (
+      {
+        status: false,
+        message : errorMessages
+      }
+    );
+  }
+};
+
+exports.fetchUserDetails = async (request, response, next) =>
+{
+  try
+  {
+    const result = await User.findOne
+    (
+      {
+        _id: request.user._id
+      }
+    );
+
+    return response.status(201).send
+    (
+      {
+        status: true,
+        message : 'Fetched user details successfully',
+        user: result
+      }
+    );
+  }
+  catch (error)
+  {
+    console.log("Error while fetching user details : ", error);
+
+    let errorMessages = [];
+
+    Object.entries(error.errors)
+      .map(
+        err =>
+        {
+          console.log(err[0]);
+          errorMessages.push(err[0])
+        }
+      );
+
+    return response.status(500).send
+    (
+      {
+        status: false,
+        message : errorMessages
+      }
+    );
+  }
+};

@@ -30,4 +30,23 @@ router.post
   userController.loginUser
 );
 
+router.get
+(
+  '/fetch',
+
+  authenticate,
+
+  userController.fetchUserDetails
+);
+
+router.post
+(
+  '/update',
+
+  authenticate,
+
+  userController.updateUser
+);
+
+
 module.exports = router;

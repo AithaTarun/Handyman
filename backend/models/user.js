@@ -1,51 +1,52 @@
 const mongoose = require('mongoose');
 
 const uniqueValidator = require('mongoose-unique-validator');
+const {Schema} = require("mongoose");
 
 const userSchema = new mongoose.Schema
 (
   {
     role:
       {
-        type: String,
+        type: Schema.Types.String,
         enum: ['admin', 'handyman', 'customer'],
         required: true
       },
 
     username:
       {
-        type: String,
+        type: Schema.Types.String,
         required: true
       },
 
     password:
       {
-        type: String,
+        type: Schema.Types.String,
         required: true
       },
 
     first_name:
       {
-        type: String,
+        type: Schema.Types.String,
         required: true
       },
 
     last_name:
       {
-        type: String,
+        type: Schema.Types.String,
         required: true
       },
 
     email:
       {
-        type: String,
+        type: Schema.Types.String,
         required: true,
         unique: true
       },
 
     phone:
       {
-        type: String,
+        type: Schema.Types.String,
         required: true,
         unique: true
       },
@@ -56,36 +57,36 @@ const userSchema = new mongoose.Schema
           {
             locality:
               {
-                type: String,
+                type: Schema.Types.String,
                 required: true
               },
 
             landmark:
               {
-                type: String
+                type: Schema.Types.String
               },
 
             pin_code:
               {
-                type: Number,
+                type: Schema.Types.Number,
                 required: true
               },
 
             city_district_town:
               {
-                type: String,
+                type: Schema.Types.String,
                 required: true
               },
 
             state:
               {
-                type: String,
+                type: Schema.Types.String,
                 required: true
               },
 
             address_line:
               {
-                type: String,
+                type: Schema.Types.String,
                 required: true
               }
           },
@@ -94,7 +95,7 @@ const userSchema = new mongoose.Schema
 
     verified:
       {
-        type: Boolean,
+        type: Schema.Types.Boolean,
         required: true,
         default: false
       }

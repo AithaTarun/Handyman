@@ -5,9 +5,35 @@
     <app-header></app-header>
   </ion-header>
 
-  <ion-content >
+  <ion-content>
 
     <ion-router-outlet></ion-router-outlet>
+
+    <ion-tabs>
+      <ion-tab-bar slot="bottom">
+
+        <ion-tab-button tab="home">
+          <ion-img [src]="currentBaseRoute === 'home' ?  'assets/icons/home_active.png' : 'assets/icons/home_inactive.png'" style="width: 32px; height: 32px"></ion-img>
+          <ion-label>Home</ion-label>
+        </ion-tab-button>
+
+        <ion-tab-button tab="profile">
+          <ion-img [src]="currentBaseRoute === 'profile' ? 'assets/icons/profile_active.png' : 'assets/icons/profile_inactive.png'" style="width: 32px; height: 32px"></ion-img>
+          <ion-label>Profile</ion-label>
+        </ion-tab-button>
+
+        <ion-tab-button tab="bookings">
+          <ion-img [src]="currentBaseRoute === 'bookings' ? 'assets/icons/bookings_active.png' : 'assets/icons/bookings_inactive.png'" style="width: 32px; height: 32px"></ion-img>
+          <ion-label>Bookings</ion-label>
+        </ion-tab-button>
+
+        <ion-tab-button tab="about">
+          <ion-img [src]="currentBaseRoute === 'about' ? 'assets/icons/about_active.png' : 'assets/icons/about_inactive.png'" style="width: 32px; height: 32px"></ion-img>
+          <ion-label>About</ion-label>
+        </ion-tab-button>
+
+      </ion-tab-bar>
+    </ion-tabs>
 
   </ion-content>
 </ion-app>

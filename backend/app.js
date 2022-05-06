@@ -98,4 +98,7 @@ catch (e)
 const userRoutes = require('./routes/user');
 app.use("/api/user", userRoutes);
 
+const storgeRoutes = require('./routes/storage');
+app.use("/api/storage", storgeRoutes);
+
 module.exports = app;
