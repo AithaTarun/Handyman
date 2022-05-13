@@ -61,6 +61,12 @@ const userProfileSchema = new mongoose.Schema
         type: Schema.Types.String
       },
 
+    skills:
+      {
+        type: [Schema.Types.String],
+        default : []
+      },
+
     verified:
       {
         type: Schema.Types.Boolean,

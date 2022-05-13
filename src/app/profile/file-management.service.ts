@@ -40,4 +40,15 @@ export class FileManagementService
       formData
     )
   }
+
+  public updateSkills(skills: string[]): Observable<any>
+  {
+    const data = {skills};
+
+    return this.http.post
+    (
+      this.BACKEND_URL+ '/storage/updateSkills',
+      data
+    );
+  }
 }

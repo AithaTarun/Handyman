@@ -218,7 +218,7 @@ export class AuthenticationService
     return this.currentUser;
   }
 
-  updateUser(first_name: string,
+  public updateUser(first_name: string,
              last_name: string,
              email: string,
              phone: string,

@@ -28,5 +28,7 @@ export interface ProfileData
     {
       id: string,
       url: string
-    }
+    },
+
+  skills: string[]
 }

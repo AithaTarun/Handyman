@@ -29,4 +29,13 @@ router.post
   storageController.uploadSingleFile
 );
 
+router.post
+(
+  '/updateSkills',
+
+  authenticate,
+
+  storageController.updateSkills
+);
+
 module.exports = router;

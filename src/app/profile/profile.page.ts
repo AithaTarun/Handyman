@@ -1,4 +1,4 @@
-import {Component, OnInit, ViewChild} from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 import {AuthenticationService} from "../authentication/authentication.service";
 import {IonSelect, ModalController, NavController, ToastController} from "@ionic/angular";
 import {FormControl, FormGroup, Validators} from "@angular/forms";
@@ -18,9 +18,9 @@ import {LocationPickerComponent} from "../locationPicker/location-picker.compone
 )
 export class ProfilePage implements OnInit
 {
-  @ViewChild('uploadFiles') uploadFiles: any;
+  @ViewChild('skillInput') skillInputRef: any;
 
-  public visible = false;
+  public pdfVisibility: boolean = false;
 
   public aadhaarCardSrc = undefined;
   public panCardSrc = undefined;
@@ -30,23 +30,14 @@ export class ProfilePage implements OnInit
   public currentDocument = "Aadhaar Card";
   public currentDocumentSRC = this.aadhaarCardSrc;
 
-  ionViewDidEnter()
-  {
-    this.visible = true;
-  }
-
-  public currentProfileData: ProfileData =
-    {
-      avatar: {id: null, url: null},
-      aadhaarCard: {id: null, url: null},
-      panCard: {id: null, url: null},
-      skillCertificates: {id: null, url: null},
-      previousEmployerDocuments: {id: null, url: null}
-    };
+  public currentProfileData: ProfileData = null;
+  public currentUserSkills = [];
 
   public currentUser;
 
-  public avatarUploading = false;
+  public avatarUploading: boolean = false;
+
+  public skillSuggestions: string[] = [];
 
   // User details
   form: FormGroup;
@@ -94,6 +85,24 @@ export class ProfilePage implements OnInit
       "West Bengal"
     ];
 
+  public skills =
+    [
+      "Baby sitting",
+      "Barber",
+      "Beautician",
+      "Builder",
+      "Carpenter",
+      "Cleaner",
+      "Doctor",
+      "Electrician",
+      "Gardener",
+      "Mechanic",
+      "Painter",
+      "Photographer",
+      "Plumber",
+      "Veterinarian"
+    ];
+
   constructor(private authenticationService: AuthenticationService,
               private navController: NavController,
               private fileManagement: FileManagementService,
@@ -102,12 +111,28 @@ export class ProfilePage implements OnInit
             )
   {}
 
-  async ionViewWillEnter()
+  public async ionViewWillEnter()
   {
     if (!this.authenticationService.getIsAuthenticated())
     {
       await this.navController.navigateRoot('/home');
+
+      const toast = await this.toastController.create
+      (
+        {
+          message: "Please authenticate to continue",
+          duration: 2000,
+          color: "danger",
+          icon: 'bug'
+        }
+      );
+      await toast.present();
     }
+  }
+
+  ionViewDidEnter()
+  {
+    this.pdfVisibility = true;
   }
 
   async ngOnInit()
@@ -119,6 +144,7 @@ export class ProfilePage implements OnInit
         if (!isAuthenticated)
         {
           this.currentProfileData = null;
+          this.currentUserSkills = [];
           this.currentUser = null;
 
           await this.navController.navigateRoot('/home');
@@ -327,6 +353,7 @@ export class ProfilePage implements OnInit
 
           this.currentDocumentSRC = this.aadhaarCardSrc;
           this.currentProfileData = response.profile;
+          this.currentUserSkills = response.profile.skills || [];
         }
       );
   }
@@ -750,5 +777,132 @@ export class ProfilePage implements OnInit
       this.currentDocumentSRC = this.previousEmployerDocumentsSrc;
       this.currentDocument = "Previous Employer Documents";
     }
+  }
+
+  public skillInputChanged($event: any)
+  {
+    const value = $event.target.value;
+
+    if (value === "")
+    {
+      this.skillSuggestions = [];
+      return;
+    }
+
+    this.skillSuggestions = this.skills.filter
+    (
+      (skill) =>
+      {
+        if (!this.currentUserSkills.includes(skill.toLowerCase()))
+        {
+          return skill.toLowerCase().startsWith(value.toLowerCase());
+        }
+
+        return false;
+      }
+    );
+  }
+
+  public async addedSkill(skill)
+  {
+    this.skillSuggestions = [];
+
+    const value = this.skillInputRef.el.childNodes[1].value.toLowerCase();
+
+    this.skillInputRef.el.childNodes[1].value = "";
+
+    if (skill === undefined)
+    {
+      if (this.currentUserSkills.includes(value))
+      {
+        // Already skill added
+        const toast = await this.toastController.create
+        (
+          {
+            message: "Already this skill is added",
+            duration: 2000,
+            color: "danger",
+            icon: 'bug'
+          }
+        );
+        await toast.present();
+
+        return;
+      }
+
+      this.currentUserSkills.push(value);
+
+      return;
+    }
+
+    this.currentUserSkills.push(skill.toLowerCase());
+  }
+
+  public getSkillChipIconPath(skill: string): string
+  {
+    for (let i = 0; i < this.skills.length; i++)
+    {
+      let s: string = this.skills[i];
+
+      if (skill.toLowerCase() === s.toLowerCase())
+      {
+        return 'assets/icons/skills/' + skill.toLowerCase() +'.png';
+      }
+    }
+
+    return 'assets/icons/skills/unknown.png';
+  }
+
+  public removeSkill(index: number)
+  {
+    this.currentUserSkills.splice(index, 1);
+  }
+
+  public saveSkills()
+  {
+    const updateSkillsObservable: Observable<any> = this.fileManagement.updateSkills(this.currentUserSkills);
+
+    updateSkillsObservable
+      .pipe
+      (
+        catchError
+        (
+          async (error: any) =>
+          {
+            console.log("Occurred Error while updating skills : ", error);
+
+            const toast = await this.toastController.create
+            (
+              {
+                message: "Error while updating skills",
+                duration: 2000,
+                color: "danger",
+                icon: 'bug'
+              }
+            );
+
+            await toast.present();
+
+            return throwError('Error occurred');
+          }
+        )
+      )
+      .subscribe
+      (
+        async (response: any) =>
+        {
+          const toast = await this.toastController.create
+          (
+            {
+              message: "Successfully saved skills",
+              duration: 2000,
+              color: "success",
+              icon: 'checkmark-done-outline'
+            }
+          );
+
+          await toast.present();
+        }
+      )
   }
 }

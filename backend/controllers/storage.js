@@ -3,20 +3,20 @@ const {Readable} = require('stream');
 
 const UserProfile = require('../models/userProfile');
 
-const oauth2Client = new google.auth.OAuth2
-(
-  process.env.GOOGLE_DRIVE_CLIENT_ID,
-  process.env.GOOGLE_DRIVE_CLIENT_SECRET,
-  process.env.GOOGLE_DRIVE_REDIRECT_URI,
-);
+// const oauth2Client = new google.auth.OAuth2
+// (
+//   process.env.GOOGLE_DRIVE_CLIENT_ID,
+//   process.env.GOOGLE_DRIVE_CLIENT_SECRET,
+//   process.env.GOOGLE_DRIVE_REDIRECT_URI,
+// );
 
-oauth2Client.setCredentials({refresh_token : process.env.GOOGLE_DRIVE_REFRESH_TOKEN});
+// oauth2Client.setCredentials({refresh_token : process.env.GOOGLE_DRIVE_REFRESH_TOKEN});
 
 const googleDrive = google.drive
 (
   {
     version: 'v3',
-    auth: oauth2Client
+    auth: process.env.GOOGLE_DRIVE_API_KEY
   }
 );
 
@@ -284,3 +284,28 @@ getDocument = async (documentType, profileData, buffers) =>
     buffers[documentType] = new Buffer.from(file.data);
   }
 }
+
+exports.updateSkills = async (request, response, next) =>
+{
+  try
+  {
+    const databaseResult = await UserProfile.updateOne
+    (
+      {
+        userID: request.user._id
+      },
+      {
+        skills: request.body.skills
+      }
+    );
+
+    return response.status(200).send({"message" : "Successfully updated skills"});
+  }
+  catch (error)
+  {
+    console.log("Error while updating skills : ", error);
+    return response.status(500).send({"message" : "Error while updating skills"});
+  }
+}
+
+

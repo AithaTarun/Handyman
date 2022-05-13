@@ -7,12 +7,12 @@
              style="height: 128px; width: 128px; border-radius: 50%"
              (click)="userAvatar.click()" *ngIf="!avatarUploading" />
 
-    <div style="margin-left: auto; margin-right: auto; position: relative" *ngIf="avatarUploading">
+    <div style="position: relative; left: 0; display: flex; justify-content: center; align-items: center" *ngIf="avatarUploading">
       <img [src]="currentProfileData && currentProfileData['avatar'] !== undefined ? currentProfileData.avatar.url : 'assets/icons/no_avatar.png'"
-           style="height: 128px; width: 128px; border-radius: 50%; filter: blur(2px)" />
+           style="height: 128px; width: 128px; border-radius: 50%; filter: blur(2px); position: relative" />
 
       <img src="assets/loaders/loader_1.gif"
-           style="height: 64px; width: 64px; position: absolute; top: 30px; bottom: 30px; left: 30px; right: 30px" />
+           style="height: 64px; width: 64px; position: absolute" />
     </div>
 
     <input accept="image/*" type="file" #userAvatar style="visibility: hidden" (change)="avatarChanged($event)">
@@ -108,7 +108,7 @@
 
         <ion-label id="formMessage" [color]="messageColor" class="ion-margin" style="font-weight: bold" *ngIf="formMessage">{{formMessage}}</ion-label>
 
-        <ion-button color="primary" [disabled]="!form.valid" type="submit" shape="round" size="block">
+        <ion-button color="primary" [disabled]="!form.valid" type="submit" shape="round">
           Update
         </ion-button>
 
@@ -116,8 +116,79 @@
 
     </div>
 
-    <div *ngIf="currentUser.role === 'handyman'">
+    <div *ngIf="currentUser && currentUser.role === 'handyman'">
 
+      <!-- Skills -->
+      <ion-list style="background-color: transparent">
+
+        <ion-item-divider color="primary" class="ion-margin" style="margin-left: 0; margin-right: 0">
+          <ion-label style="font-weight: bold">
+            Skills
+          </ion-label>
+        </ion-item-divider>
+
+      </ion-list>
+
+      <ion-item class="ion-margin-horizontal" style="--ion-background-color:transparent; border: 1px solid #3880ff; border-radius: 20px" #skillInput>
+        <ion-label style="margin-top: 3px; margin-bottom: 3px">
+          <ion-img class="ion-float-left" style="height: 32px; width: 32px" src="assets/icons/skill_search.png"></ion-img>
+        </ion-label>
+
+        <ion-input clearInput="true" color="primary" placeholder="Enter Skill"
+                   type="text" (ionChange)="skillInputChanged($event)" maxlength="20"></ion-input>
+      </ion-item>
+
+      <ion-list *ngIf="skillInputRef && skillInputRef.el.childNodes[1].value" class="ion-margin-horizontal"
+                style="border: thin solid #9cc0ff; margin-top: 1px; border-radius: 5px; padding-top: 2px; padding-bottom: 2px;
+                position: absolute; z-index: 99; --ion-background-color: white"
+                [style.width]="skillInputRef.el.clientWidth + 'px'"
+      >
+
+        <ion-item *ngFor="let skill of skillSuggestions" class="ion-activatable"
+                  style="position: relative; overflow: hidden; --padding-start: 4px; --padding-end: 4px"
+                  (click)="addedSkill(skill)">
+
+          <ion-avatar style="margin-right: 10px"><img [src]="'assets/icons/skills/'+ skill.toLowerCase() +'.png'"></ion-avatar>
+          <ion-label>{{skill}}</ion-label>
+
+          <ion-ripple-effect></ion-ripple-effect>
+
+        </ion-item>
+
+        <ion-item class="ion-activatable" style="position: relative; overflow: hidden; --padding-start: 4px; --padding-end: 4px"
+                  (click)="addedSkill(undefined)">
+
+          <ion-avatar style="margin-right: 10px"><img src="assets/icons/addSkill.svg" style="width: 40px; height: 40px"></ion-avatar>
+          <ion-label>Add this skill to your skills</ion-label>
+
+          <ion-ripple-effect></ion-ripple-effect>
+
+        </ion-item>
+
+      </ion-list>
+
+      <p class="ion-text-center">
+
+        <ion-chip *ngFor="let skill of currentUserSkills; let i = index" outline="true" color="secondary">
+          <ion-avatar>
+            <img [src]="getSkillChipIconPath(skill)">
+          </ion-avatar>
+          <ion-label style="font-weight: bold">{{skill | titlecase}}</ion-label>
+          <ion-icon name="close-circle" (click)="removeSkill(i)"></ion-icon>
+        </ion-chip>
+
+        <span class="" *ngIf="currentUserSkills.length === 0">
+          <ion-img src="assets/icons/no_skills.png" style="width: 64px; height: 64px; margin-right: auto; margin-left: auto"></ion-img>
+          <ion-label color="danger" style="font-weight: bold">No skills found</ion-label>
+        </span>
+
+      </p>
+
+      <ion-button color="primary" type="button" shape="round" (click)="saveSkills()">
+        Save
+      </ion-button>
+
+      <!-- Verification documents -->
       <ion-list style="background-color: transparent">
 
         <ion-item-divider color="primary" class="ion-margin" style="margin-left: 0; margin-right: 0">
@@ -128,7 +199,7 @@
 
       </ion-list>
 
-      <ion-item class="ion-margin">
+      <ion-item class="ion-margin-horizontal ion-margin-bottom">
         <ion-label>Select Document Type</ion-label>
         <ion-select interface="action-sheet" value="aadhaarCard" #documentSelector (ionChange)="documentSelectionChanged(documentSelector)">
           <ion-select-option value="aadhaarCard">Aadhaar Card</ion-select-option>
@@ -146,7 +217,7 @@
       <div *ngIf="currentDocumentSRC === undefined" class="ion-margin">
         <ion-img src="assets/icons/documentUpload.png" style="width: 96px; height: 96px; margin-left: auto; margin-right: auto" (click)="userDocument.click()"></ion-img>
       </div>
-      <div *ngIf="currentDocumentSRC !== undefined && visible" class="ion-margin">
+      <div *ngIf="currentDocumentSRC !== undefined && pdfVisibility" class="ion-margin-vertical">
 
         <ngx-extended-pdf-viewer
           [customToolbar]="customToolbar"
