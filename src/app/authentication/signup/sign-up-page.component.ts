@@ -419,53 +419,6 @@ export class SignUpPage implements OnInit
     );
 
     createUserObservable
-      .pipe
-      (
-        catchError
-        (
-          (error: any) =>
-          {
-            console.log("Occurred Error : ", error);
-
-            const errorMessages: string[] = error.error.message;
-
-            console.log(errorMessages);
-
-            errorMessages.every
-            (
-              (message) =>
-              {
-                if (message === 'username')
-                {
-                  this.formMessage = "Username already taken";
-                  this.messageColor = 'danger';
-                  this.form.get('username').setErrors({'incorrect': true});
-
-                  return false;
-                }
-                else if (message === 'email')
-                {
-                  this.formMessage = "Email already taken";
-                  this.messageColor = 'danger';
-                  this.form.get('email').setErrors({'incorrect': true});
-
-                  return false;
-                }
-                else if (message === 'phone')
-                {
-                  this.formMessage = "Mobile number already taken";
-                  this.messageColor = 'danger';
-                  this.form.get('phone').setErrors({'incorrect': true});
-
-                  return false;
-                }
-              }
-            )
-
-            return throwError('Error occurred');
-          }
-        )
-      )
       .subscribe
       (
         (response: any) =>
@@ -475,6 +428,48 @@ export class SignUpPage implements OnInit
           this.form.reset();
 
           this.openOTPVerification(this.selectedRole, response.result.username);
+        },
+
+        (error: any) =>
+        {
+          console.log("Occurred Error : ", error);
+
+          const errorMessages: string[] = error.error.message;
+
+          console.log(errorMessages);
+
+          errorMessages.every
+          (
+            (message) =>
+            {
+              if (message === 'username')
+              {
+                this.formMessage = "Username already taken";
+                this.messageColor = 'danger';
+                this.form.get('username').setErrors({'incorrect': true});
+
+                return false;
+              }
+              else if (message === 'email')
+              {
+                this.formMessage = "Email already taken";
+                this.messageColor = 'danger';
+                this.form.get('email').setErrors({'incorrect': true});
+
+                return false;
+              }
+              else if (message === 'phone')
+              {
+                this.formMessage = "Mobile number already taken";
+                this.messageColor = 'danger';
+                this.form.get('phone').setErrors({'incorrect': true});
+
+                return false;
+              }
+            }
+          )
+
+          return throwError('Error occurred');
         }
       )
   }

@@ -304,32 +304,9 @@ export class ProfilePage implements OnInit
   public fetchUserProfile()
   {
     this.fileManagement.fetchProfile()
-      .pipe<any>
-      (
-        catchError
-        (
-          async (error: any) =>
-          {
-            console.log("Occurred Error : ", error);
-
-            const toast = await this.toastController.create
-            (
-              {
-                message: "Error while fetching profile",
-                duration: 2000,
-                color: "danger",
-                icon: 'bug'
-              }
-            );
-            await toast.present();
-
-            return throwError('Error occurred');
-          }
-        )
-      )
       .subscribe
       (
-        async (response) =>
+        async (response: any) =>
         {
           if (response.buffers['aadhaarCard'] !== undefined)
           {
@@ -354,6 +331,24 @@ export class ProfilePage implements OnInit
           this.currentDocumentSRC = this.aadhaarCardSrc;
           this.currentProfileData = response.profile;
           this.currentUserSkills = response.profile.skills || [];
+        },
+
+        async (error: any) =>
+        {
+          console.log("Occurred Error : ", error);
+
+          const toast = await this.toastController.create
+          (
+            {
+              message: "Error while fetching profile",
+              duration: 2000,
+              color: "danger",
+              icon: 'bug'
+            }
+          );
+          await toast.present();
+
+          return throwError('Error occurred');
         }
       );
   }
@@ -377,31 +372,6 @@ export class ProfilePage implements OnInit
     (
       event.target.files.item(0), "avatar"
     )
-      .pipe<any>
-      (
-        catchError
-        (
-          async (error: any) =>
-          {
-            console.log("Occurred Error : ", error);
-
-            const toast = await this.toastController.create
-            (
-              {
-                message: "Error while updating avatar",
-                duration: 2000,
-                color: "danger",
-                icon: 'bug'
-              }
-            );
-            await toast.present();
-
-            this.avatarUploading = false;
-
-            return throwError('Error occurred');
-          }
-        )
-      )
       .subscribe
       (
         async (response) =>
@@ -421,6 +391,27 @@ export class ProfilePage implements OnInit
           this.avatarUploading = false;
 
           this.currentProfileData = response.profile;
+        },
+
+        async (error: any) =>
+        {
+          console.log("Occurred Error : ", error);
+
+          const toast = await this.toastController.create
+          (
+            {
+              message: "Error while updating avatar",
+              duration: 2000,
+              color: "danger",
+              icon: 'bug'
+            }
+          );
+
+          await toast.present();
+
+          this.avatarUploading = false;
+
+          return throwError('Error occurred');
         }
       )
   }
@@ -434,32 +425,9 @@ export class ProfilePage implements OnInit
     (
       event.target.files.item(0), documentType
     )
-      .pipe<any>
-      (
-        catchError
-        (
-          async (error: any) =>
-          {
-            console.log("Occurred Error : ", error);
-
-            const toast = await this.toastController.create
-            (
-              {
-                message: "Error while updating " + documentName,
-                duration: 2000,
-                color: "danger",
-                icon: 'bug'
-              }
-            );
-            await toast.present();
-
-            return throwError('Error occurred');
-          }
-        )
-      )
       .subscribe
       (
-        async (response) =>
+        async (response: any) =>
         {
           const toast = await this.toastController.create
           (
@@ -495,6 +463,24 @@ export class ProfilePage implements OnInit
           }
 
           this.currentProfileData = response.profile;
+        },
+
+        async (error: any) =>
+        {
+          console.log("Occurred Error : ", error);
+
+          const toast = await this.toastController.create
+          (
+            {
+              message: "Error while updating " + documentName,
+              duration: 2000,
+              color: "danger",
+              icon: 'bug'
+            }
+          );
+          await toast.present();
+
+          return throwError('Error occurred');
         }
       )
   }
@@ -642,49 +628,6 @@ export class ProfilePage implements OnInit
     );
 
     updateUserObservable
-      .pipe
-      (
-        catchError
-        (
-          async (error: any) =>
-          {
-            console.log("Occurred Error : ", error);
-
-            const errorMessages: string[] = error.error.message;
-
-            console.log(errorMessages);
-
-            errorMessages.every
-            (
-              (message) =>
-              {
-                if (message === 'phone')
-                {
-                  this.formMessage = "Mobile number already taken";
-                  this.messageColor = 'danger';
-                  this.form.get('phone').setErrors({'incorrect': true});
-
-                  return false;
-                }
-              }
-            );
-
-            const toast = await this.toastController.create
-            (
-              {
-                message: "Error while updating details",
-                duration: 2000,
-                color: "danger",
-                icon: 'bug'
-              }
-            );
-
-            await toast.present();
-
-            return throwError('Error occurred');
-          }
-        )
-      )
       .subscribe
       (
         async (response: any) =>
@@ -702,6 +645,44 @@ export class ProfilePage implements OnInit
           await toast.present();
 
           this.authenticationService.setCurrentUser(response.user);
+        },
+
+        async (error: any) =>
+        {
+          console.log("Occurred Error : ", error);
+
+          const errorMessages: string[] = error.error.message;
+
+          console.log(errorMessages);
+
+          errorMessages.every
+          (
+            (message) =>
+            {
+              if (message === 'phone')
+              {
+                this.formMessage = "Mobile number already taken";
+                this.messageColor = 'danger';
+                this.form.get('phone').setErrors({'incorrect': true});
+
+                return false;
+              }
+            }
+          );
+
+          const toast = await this.toastController.create
+          (
+            {
+              message: "Error while updating details",
+              duration: 2000,
+              color: "danger",
+              icon: 'bug'
+            }
+          );
+
+          await toast.present();
+
+          return throwError('Error occurred');
         }
       )
   }
@@ -863,30 +844,6 @@ export class ProfilePage implements OnInit
     const updateSkillsObservable: Observable<any> = this.fileManagement.updateSkills(this.currentUserSkills);
 
     updateSkillsObservable
-      .pipe
-      (
-        catchError
-        (
-          async (error: any) =>
-          {
-            console.log("Occurred Error while updating skills : ", error);
-
-            const toast = await this.toastController.create
-            (
-              {
-                message: "Error while updating skills",
-                duration: 2000,
-                color: "danger",
-                icon: 'bug'
-              }
-            );
-
-            await toast.present();
-
-            return throwError('Error occurred');
-          }
-        )
-      )
       .subscribe
       (
         async (response: any) =>
@@ -902,6 +859,25 @@ export class ProfilePage implements OnInit
           );
 
           await toast.present();
+        },
+
+        async (error: any) =>
+        {
+          console.log("Occurred Error while updating skills : ", error);
+
+          const toast = await this.toastController.create
+          (
+            {
+              message: "Error while updating skills",
+              duration: 2000,
+              color: "danger",
+              icon: 'bug'
+            }
+          );
+
+          await toast.present();
+
+          return throwError('Error occurred');
         }
       )
   }

@@ -117,17 +117,7 @@ export class LocationPickerComponent
     (
       encodeURI(`https://api.mapbox.com/geocoding/v5/mapbox.places/${longitude},${latitude}.json?access_token=${environment.MAPBOX_KEY}`)
     )
-    .pipe
-    (
-      catchError
-      (
-        (error: any) =>
-        {
-          console.log("Error while reverse geocoding : ", error)
-          return throwError(error);
-        }
-      )
-    ).subscribe
+      .subscribe
       (
         (response: any) =>
         {
@@ -142,6 +132,12 @@ export class LocationPickerComponent
           this.searchBar.el.value = features[0].place_name;
 
           this.selectedFeature = features[0];
+        },
+
+        (error: any) =>
+        {
+          console.log("Error while reverse geocoding : ", error)
+          return throwError(error);
         }
       );
   }
@@ -159,17 +155,7 @@ export class LocationPickerComponent
     (
       encodeURI(`https://api.mapbox.com/geocoding/v5/mapbox.places/${input}.json?country=IN&limit=5&access_token=${environment.MAPBOX_KEY}`)
     )
-      .pipe
-      (
-        catchError
-        (
-          (error: any) =>
-          {
-            console.log("Error while forward geocoding : ", error)
-            return throwError(error);
-          }
-        )
-      ).subscribe
+     .subscribe
     (
       (response: any) =>
       {
@@ -196,6 +182,12 @@ export class LocationPickerComponent
         {
           this.locationsList.el.style.display = "none";
         }
+      },
+
+      (error: any) =>
+      {
+        console.log("Error while forward geocoding : ", error)
+        return throwError(error);
       }
     );
   }

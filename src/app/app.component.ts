@@ -1,6 +1,5 @@
 import {Component, OnInit} from '@angular/core';
 import {AuthenticationService} from "./authentication/authentication.service";
-import {NavController} from "@ionic/angular";
 import {NavigationEnd, Router} from "@angular/router";
 
 @Component({

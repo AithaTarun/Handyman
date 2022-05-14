@@ -128,58 +128,6 @@ export class SignInPage implements OnInit
     );
 
     loginUserObservable
-      .pipe
-      (
-        catchError
-        (
-          (error: any) =>
-          {
-            console.log("Occurred Error : ", error);
-
-            this.formMessage = error.error.message;
-            this.messageColor = 'danger';
-
-            if (error.error.message === "Account not verified")
-            {
-              const resendObservable: Observable<any> = this.authenticationService.resendOTP
-              (
-                this.selectedRole, this.form.get('username').value
-              );
-
-              resendObservable
-                .pipe
-                (
-                  catchError
-                  (
-                    (error: any) =>
-                    {
-                      console.log("Occurred Error : ", error);
-
-                      this.formMessage = error.error.message;
-                      this.messageColor = 'danger';
-
-                      return throwError('Error occurred');
-                    }
-                  )
-                )
-                .subscribe
-                (
-                  (response: any) =>
-                  {
-                    this.formMessage = response.message;
-                    this.messageColor = 'success';
-
-                    this.openOTPVerification(this.selectedRole, this.form.get('username').value);
-
-                    this.form.reset();
-                  }
-                );
-            }
-
-            return throwError('Error occurred');
-          }
-        )
-      )
       .subscribe
       (
         async (response: any) =>
@@ -189,6 +137,48 @@ export class SignInPage implements OnInit
           this.form.reset();
 
           await this.authenticationService.login(response);
+        },
+
+        (error: any) =>
+        {
+          console.log("Occurred Error : ", error);
+
+          this.formMessage = error.error.message;
+          this.messageColor = 'danger';
+
+          if (error.error.message === "Account not verified")
+          {
+            const resendObservable: Observable<any> = this.authenticationService.resendOTP
+            (
+              this.selectedRole, this.form.get('username').value
+            );
+
+            resendObservable
+              .subscribe
+              (
+                (response: any) =>
+                {
+                  this.formMessage = response.message;
+                  this.messageColor = 'success';
+
+                  this.openOTPVerification(this.selectedRole, this.form.get('username').value);
+
+                  this.form.reset();
+                },
+
+                (error: any) =>
+                {
+                  console.log("Occurred Error : ", error);
+
+                  this.formMessage = error.error.message;
+                  this.messageColor = 'danger';
+
+                  return throwError('Error occurred');
+                }
+              );
+          }
+
+          return throwError('Error occurred');
         }
       )
 

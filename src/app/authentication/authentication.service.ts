@@ -245,24 +245,19 @@ export class AuthenticationService
     (
       this.BACKEND_URL + '/user/fetch'
     )
-      .pipe<any>
-      (
-        catchError
-        (
-          async (error: any) =>
-          {
-            console.log("Error while fetching user details : ", error);
-
-            return throwError('Error occurred');
-          }
-        )
-      )
       .subscribe
       (
-        (response) =>
+        (response: any) =>
         {
           this.currentUser = response.user;
           this.userChangeListener.next(this.currentUser);
+        },
+
+        async (error: any) =>
+        {
+          console.log("Error while fetching user details : ", error);
+
+          return throwError('Error occurred');
         }
       )
   }

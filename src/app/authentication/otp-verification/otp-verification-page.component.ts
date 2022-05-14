@@ -140,21 +140,6 @@ export class OtpVerificationPage implements OnInit
     );
 
     verifyObservable
-      .pipe
-      (
-        catchError
-        (
-          (error: any) =>
-          {
-            console.log("Occurred Error : ", error);
-
-            this.formMessage = error.error.message;
-            this.messageColor = 'danger';
-
-            return throwError('Error occurred');
-          }
-        )
-      )
       .subscribe
       (
         (response: any) =>
@@ -165,6 +150,16 @@ export class OtpVerificationPage implements OnInit
           this.form.reset();
 
           this.openSignIn();
+        },
+
+        (error: any) =>
+        {
+          console.log("Occurred Error : ", error);
+
+          this.formMessage = error.error.message;
+          this.messageColor = 'danger';
+
+          return throwError('Error occurred');
         }
       )
   }
@@ -179,21 +174,6 @@ export class OtpVerificationPage implements OnInit
       );
 
       resendObservable
-        .pipe
-        (
-          catchError
-          (
-            (error: any) =>
-            {
-              console.log("Occurred Error : ", error);
-
-              this.formMessage = error.error.message;
-              this.messageColor = 'danger';
-
-              return throwError('Error occurred');
-            }
-          )
-        )
         .subscribe
         (
           (response: any) =>
@@ -204,6 +184,16 @@ export class OtpVerificationPage implements OnInit
             this.form.reset();
 
             this.resetResendOTPTimer();
+          },
+
+          (error: any) =>
+          {
+            console.log("Occurred Error : ", error);
+
+            this.formMessage = error.error.message;
+            this.messageColor = 'danger';
+
+            return throwError('Error occurred');
           }
         );
     }
