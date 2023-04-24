@@ -10,7 +10,8 @@ const databaseName = 'handyman-database';
 
 mongoose.connect
 (
-  connectionURL + "/" + databaseName,
+  // connectionURL + "/" + databaseName,
+  connectionURL,
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
